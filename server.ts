@@ -20,7 +20,7 @@ app.set('json spaces', 4);
 http.listen(3000, function () {
   console.log(colors.red('--------------------------------'));
   console.log(colors.red('Server has starting at'), colors.blue(date));
-  console.log('Server host: ', colors.green('127.0.0.1:3000'));
+  console.log('Server host: ', colors.green('localhost:3000'));
   console.log('Server status: ', colors.green('Started'));
 });
 
@@ -126,4 +126,34 @@ app.post('/api/auth_storage/:id?/:handshake?', (req, res) => {
   }
 });
 
-app.get('/api/user/:id', (req, res) => {});
+app.post('/api/user/:id?', (req, res) => {
+  if (!req.query.id) {
+    console.log('Niepowodzenie pobrania danych usera');
+    return res.json({
+      error: true,
+      msg: 'Bad request'
+    })
+  }else{
+    connection.db.collection('Accounts', (err, UsersCollection) => {
+      UsersCollection.find({
+        _id: new ObjectId(req.query.id)
+      }).toArray((err, data) => {
+        if (err) {
+          return res.json({ error: true, msg: err });
+        }else{
+          if (!data[0]) {
+            return res.json({
+              error: true,
+              msg: 'No data',
+            })
+          }else{
+            return res.json({
+              error: false,
+              res: data[0].data
+            })
+          }
+        }
+      })
+    })
+  }
+});
