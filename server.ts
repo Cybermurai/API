@@ -189,3 +189,8 @@ app.post("/api/book/:id?", (req, res) => {
     });
   }
 });
+
+app.post("/api/createBook/:title?", (req, res) => {
+  console.log("tworzenie eksiazki");
+  return req.query.title;
+});
