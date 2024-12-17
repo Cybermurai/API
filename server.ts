@@ -14,7 +14,7 @@ const date = new Date().toLocaleString("pl-PL", { timeZone: "Europe/Warsaw" });
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors({ origin: config.host }));
+app.use(cors());
 app.set("json spaces", 4);
 
 http.listen(3000, function () {
@@ -190,7 +190,7 @@ app.post("/api/book/:id?", (req, res) => {
   }
 });
 
-app.post("/api/createBook/:title?", (req, res) => {
-  console.log("tworzenie eksiazki");
-  return req.query.title;
+app.post("/api/createBook/", (req, res) => {
+  console.log("create book initite");
+  return res.json({ title: "title2" });
 });
