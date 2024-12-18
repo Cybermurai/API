@@ -190,7 +190,7 @@ app.post("/api/book/:id?", (req, res) => {
   }
 });
 
-app.post("/api/createBook/", (req, res) => {
-  console.log("create book initite");
-  return res.json({ title: "title2" });
+app.post("/api/createBook/:title?", (req, res) => {
+  console.log(req.query.title);
+  return res.json({ title: req.query.title });
 });
