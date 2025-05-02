@@ -11,16 +11,16 @@ const mongodb = require("./config/mongodb.js");
 const configFile = require("./config/config.js");
 const config = configFile.config;
 const date = new Date().toLocaleString("pl-PL", { timeZone: "Europe/Warsaw" });
-
+const host = "localhost";
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.set("json spaces", 4);
 
-http.listen(3000, function () {
+http.listen(3000, host, function () {
   console.log(colors.red("--------------------------------"));
   console.log(colors.red("Server has starting at"), colors.blue(date));
-  console.log("Server host: ", colors.green("localhost:3000"));
+  console.log("Server host: ", colors.green(host + ":3000"));
   console.log("Server status: ", colors.green("Started"));
 });
 
@@ -160,7 +160,7 @@ app.post("/api/user/:id?", (req, res) => {
 
 app.post("/api/book/:id?", (req, res) => {
   if (!req.query.id) {
-    console.log("Niepowodzenie pobrania danych ksiazki");
+    console.log("Niepowodzenie pobrania danych ksiazki " + req.query.id);
     return res.json({
       error: true,
       msg: "Bad request",
@@ -177,6 +177,8 @@ app.post("/api/book/:id?", (req, res) => {
             return res.json({
               error: true,
               msg: "No data",
+              id: req.query.id,
+              data: data,
             });
           } else {
             return res.json({
@@ -188,6 +190,28 @@ app.post("/api/book/:id?", (req, res) => {
       });
     });
   }
+});
+
+app.post("/api/books/", (req, res) => {
+  connection.db.collection("Books", (err, BooksCollection) => {
+    BooksCollection.find().toArray((err, data) => {
+      if (err) {
+        return res.json({ error: true, msg: err });
+      } else {
+        if (!data[0]) {
+          return res.json({
+            error: true,
+            msg: "No data",
+          });
+        } else {
+          return res.json({
+            error: false,
+            res: data,
+          });
+        }
+      }
+    });
+  });
 });
 
 app.post("/api/createBook/:title?", (req, res) => {
