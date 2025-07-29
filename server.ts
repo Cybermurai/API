@@ -12,7 +12,7 @@ const configFile = require("./config/config.js");
 const config = configFile.config;
 const date = new Date().toLocaleString("pl-PL", { timeZone: "Europe/Warsaw" });
 const host = "localhost";
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.set("json spaces", 4);
@@ -168,7 +168,7 @@ app.post("/api/book/:id?", (req, res) => {
   } else {
     connection.db.collection("Books", (err, BooksCollection) => {
       BooksCollection.find({
-        _id: new ObjectId(req.query.id),
+        id: req.query.id,
       }).toArray((err, data) => {
         if (err) {
           return res.json({ error: true, msg: err });
@@ -214,7 +214,30 @@ app.post("/api/books/", (req, res) => {
   });
 });
 
-app.post("/api/createBook/:title?", (req, res) => {
-  console.log(req.query.title);
-  return res.json({ title: req.query.title });
+app.post("/api/publishBook/:data?", (req, res) => {
+  if (!req.body.data) {
+    console.log("Niepowodzenie pobrania danych ksiazki " + req.body.data);
+    return res.json({
+      error: true,
+      msg: "Bad request",
+    });
+  } else {
+    //Dodanie nowej ksiazki do bazy mongodb
+    connection.db.collection("Books", (err, BooksCollection) => {
+      BooksCollection.insertOne(req.body.data);
+      if (err) {
+        console.log(err);
+        return;
+      } else {
+        console.log(
+          "Książka " + req.body.data.metadata.title + " została opublikowana"
+        );
+        return res.json({
+          error: false,
+          msg:
+            "Książka " + req.body.data.metadata.title + " została opublikowana",
+        });
+      }
+    });
+  }
 });

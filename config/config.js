@@ -1,5 +1,5 @@
 var config = {
-  host: "localhost:8100",
+  host: "localhost:4200",
   db: {
     host: "195.167.159.167",
     port: "27017",
